@@ -233,10 +233,10 @@ function createBundle(defines) {
 	console.log();
 	console.log('### Bundling files into pdf.js');
 
-	var mainAMDName = 'pdfjs-dist/build/pdf';
+	var mainAMDName = 'embed-pdfjs-dist/build/pdf';
 	var mainOutputName = 'pdf.js';
 	if (defines.SINGLE_FILE) {
-		mainAMDName = 'pdfjs-dist/build/pdf.combined';
+		mainAMDName = 'embed-pdfjs-dist/build/pdf.combined';
 		mainOutputName = 'pdf.combined.js';
 	}
 
@@ -254,7 +254,7 @@ function createBundle(defines) {
 		return mainOutput; // don't need a worker file.
 	}
 
-	var workerAMDName = 'pdfjs-dist/build/pdf.worker';
+	var workerAMDName = 'embed-pdfjs-dist/build/pdf.worker';
 	var workerOutputName = 'pdf.worker.js';
 
 	var workerFileConfig = createWebpackConfig(defines, {
@@ -281,17 +281,17 @@ function createWebBundle(defines) {
 }
 
 function createEmbeddedWebBundle(defines) {
-	var viewerOutputName = 'embedded_viewer.js';
+	var viewerOutputName = 'pdf.embeddedviewer.js';
 
 	var viewerFileConfig = createWebpackConfig(defines, {
 		filename: viewerOutputName,
 	});
-	return gulp.src('./web/embedded_viewer.js')
+	return gulp.src('./web/pdf.embeddedviewer.js')
 		.pipe(webpack2Stream(viewerFileConfig));
 }
 
 function createComponentsBundle(defines) {
-	var componentsAMDName = 'pdfjs-dist/web/pdf_viewer';
+	var componentsAMDName = 'embed-pdfjs-dist/web/pdf_viewer';
 	var componentsOutputName = 'pdf_viewer.js';
 
 	var componentsFileConfig = createWebpackConfig(defines, {
@@ -307,7 +307,7 @@ function createComponentsBundle(defines) {
 }
 
 function createCompatibilityBundle(defines) {
-	var compatibilityAMDName = 'pdfjs-dist/web/compatibility';
+	var compatibilityAMDName = 'embed-pdfjs-dist/web/compatibility';
 	var compatibilityOutputName = 'compatibility.js';
 
 	var compatibilityFileConfig = createWebpackConfig(defines, {
@@ -697,6 +697,8 @@ gulp.task('minified-pre', ['buildnumber', 'locale'], function () {
 			.pipe(gulp.dest(MINIFIED_DIR + 'web')),
 		preprocessCSS('web/viewer.css', 'minified', defines, true)
 			.pipe(gulp.dest(MINIFIED_DIR + 'web')),
+		preprocessCSS('web/pdf.embeddedviewer.css', 'minified', defines, true)
+			.pipe(gulp.dest(MINIFIED_DIR + 'web')),
 
 		gulp.src('web/compressed.tracemonkey-pldi-09.pdf')
 			.pipe(gulp.dest(MINIFIED_DIR + 'web')),
@@ -705,15 +707,14 @@ gulp.task('minified-pre', ['buildnumber', 'locale'], function () {
 
 gulp.task('minified-post', ['minified-pre'], function () {
 	var pdfFile = fs.readFileSync(MINIFIED_DIR + '/build/pdf.js').toString();
-	var pdfWorkerFile =
-		fs.readFileSync(MINIFIED_DIR + '/build/pdf.worker.js').toString();
+	var pdfWorkerFile = fs.readFileSync(MINIFIED_DIR + '/build/pdf.worker.js').toString();
 	var viewerFiles = {
 		'pdf.js': pdfFile,
 		'viewer.js': fs.readFileSync(MINIFIED_DIR + '/web/viewer.js').toString(),
 	};
 	var embeddedViewerFiles = {
-		'pdf.js': pdfFile,
-		'embedded_viewer.js': fs.readFileSync(MINIFIED_DIR + '/web/embedded_viewer.js').toString(),
+		//'pdf.js': pdfFile,
+		'pdf.embeddedviewer.js': fs.readFileSync(MINIFIED_DIR + '/web/pdf.embeddedviewer.js').toString(),
 	};
 
 	console.log();
@@ -725,7 +726,7 @@ gulp.task('minified-post', ['minified-pre'], function () {
 
 	fs.writeFileSync(MINIFIED_DIR + '/web/pdf.viewer.js',
 		UglifyES.minify(viewerFiles).code);
-	fs.writeFileSync(MINIFIED_DIR + '/web/pdf.embedded.viewer.js',
+	fs.writeFileSync(MINIFIED_DIR + '/web/pdf.embeddedviewer.min.js',
 		UglifyES.minify(embeddedViewerFiles).code);
 	fs.writeFileSync(MINIFIED_DIR + '/build/pdf.min.js',
 		UglifyES.minify(pdfFile).code);
@@ -736,7 +737,6 @@ gulp.task('minified-post', ['minified-pre'], function () {
 	console.log('### Cleaning js files');
 
 	fs.unlinkSync(MINIFIED_DIR + '/web/viewer.js');
-	fs.unlinkSync(MINIFIED_DIR + '/web/embedded_viewer.js');
 	fs.unlinkSync(MINIFIED_DIR + '/web/debugger.js');
 	fs.unlinkSync(MINIFIED_DIR + '/build/pdf.js');
 	fs.unlinkSync(MINIFIED_DIR + '/build/pdf.worker.js');
@@ -1059,7 +1059,7 @@ gulp.task('lib', ['buildnumber'], function () {
 			'web/*.js',
 			'!web/pdfjs.js',
 			'!web/viewer.js',
-			'!web/embedded_viewer.js',
+			'!web/pdf.embeddedviewer.js',
 			'!web/compatibility.js',
 		], { base: '.', }),
 		gulp.src('test/unit/*.js', { base: '.', }),
@@ -1303,8 +1303,7 @@ gulp.task('gh-pages-git', ['gh-pages-prepare', 'wintersmith'], function () {
 
 gulp.task('web', ['gh-pages-prepare', 'wintersmith', 'gh-pages-git']);
 
-gulp.task('dist-pre',
-	['generic', 'singlefile', 'components', 'lib', 'minified'],
+gulp.task('dist-pre', ['generic', 'singlefile', 'components', 'lib', 'minified'],
 	function () {
 		var VERSION = getVersionJSON().version;
 
@@ -1329,7 +1328,7 @@ gulp.task('dist-pre',
 		var npmManifest = {
 			name: DIST_NAME,
 			version: VERSION,
-			main: 'build/pdf.js',
+			main: 'build/index.js',
 			description: DIST_DESCRIPTION,
 			keywords: DIST_KEYWORDS,
 			homepage: DIST_HOMEPAGE,
@@ -1401,11 +1400,21 @@ gulp.task('dist-pre',
 				.pipe(gulp.dest(DIST_DIR + 'web/')),
 			gulp.src(LIB_DIR + '**/*', { base: LIB_DIR, })
 				.pipe(gulp.dest(DIST_DIR + 'lib/')),
-			gulp.src(MINIFIED_DIR + 'web/pdf.embedded.viewer.*')
+
+			gulp.src(MINIFIED_DIR + 'web/pdf.embeddedviewer.*')
 				.pipe(gulp.dest(DIST_DIR + 'web/')),
-			gulp.src(MINIFIED_DIR + 'web/viewer.css')
-				.pipe(rename('pdf.embedded.viewer.css'))
+			gulp.src(MINIFIED_DIR + 'web/pdf.embeddedviewer.css')
 				.pipe(gulp.dest(DIST_DIR + 'web/')),
+			gulp.src(MINIFIED_DIR + 'web/viewer.html')
+				.pipe(rename('pdf.embeddedviewer.html'))
+				.pipe(gulp.dest(DIST_DIR + 'web/')),
+			gulp.src(MINIFIED_DIR + 'web/images/*')
+				.pipe(gulp.dest(DIST_DIR + 'web/images/')),
+			gulp.src(MINIFIED_DIR + 'web/locale/**')
+				.pipe(gulp.dest(DIST_DIR + 'web/locale/')),
+			gulp.src('web/pdf.embeddedviewer.entry.js')
+				.pipe(rename('index.js'))
+				.pipe(gulp.dest(DIST_DIR + 'build/')),
 		]);
 	});
 

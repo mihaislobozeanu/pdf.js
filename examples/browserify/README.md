@@ -22,5 +22,5 @@ shall be excluded from the main bundle.
 Alternatives to the gulp commands (without compression) are:
 
     $ mkdir -p ../../build/browserify
-    $ node_modules/.bin/browserify main.js -u ./node_modules/pdfjs-dist/build/pdf.worker.js -o ../../build/browserify/main.bundle.js
+    $ node_modules/.bin/browserify main.js -u ./node_modules/embed-pdfjs-dist/build/pdf.worker.js -o ../../build/browserify/main.bundle.js
     $ node_modules/.bin/browserify worker.js -o ../../build/browserify/pdf.worker.bundle.js

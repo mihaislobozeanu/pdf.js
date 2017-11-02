@@ -171,7 +171,7 @@ function getViewerConfiguration() {
 	};
 }
 
-export function webEmbeddedViewerLoad(url) {
+PDFJS.webEmbeddedViewerLoad = function webEmbeddedViewerLoad(url) {
 	let config = getViewerConfiguration();
 	config.defaultUrl = url || config.defaultUrl;
 	if (typeof PDFJSDev === 'undefined' || !PDFJSDev.test('PRODUCTION')) {
@@ -181,10 +181,10 @@ export function webEmbeddedViewerLoad(url) {
 			SystemJS.import('pdfjs-web/pdf_print_service'),
 		]).then(function ([app, ...otherModules]) {
 			window.PDFViewerApplication = app.PDFViewerApplication;
-			app.PDFViewerApplication.run(config);
+			return app.PDFViewerApplication.run(config);
 		});
 	} else {
 		window.PDFViewerApplication = pdfjsWebApp.PDFViewerApplication;
-		pdfjsWebApp.PDFViewerApplication.run(config);
+		return pdfjsWebApp.PDFViewerApplication.run(config);
 	}
 };

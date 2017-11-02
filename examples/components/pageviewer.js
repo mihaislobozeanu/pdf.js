@@ -16,17 +16,17 @@
 'use strict';
 
 if (!PDFJS.PDFViewer || !PDFJS.getDocument) {
-  alert('Please build the pdfjs-dist library using\n' +
-        '  `gulp dist-install`');
+	alert('Please build the embed-pdfjs-dist library using\n' +
+		'  `gulp dist-install`');
 }
 
 // The workerSrc property shall be specified.
 //
-PDFJS.workerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.js';
+PDFJS.workerSrc = '../../node_modules/embed-pdfjs-dist/build/pdf.worker.js';
 
 // Some PDFs need external cmaps.
 //
-// PDFJS.cMapUrl = '../../node_modules/pdfjs-dist/cmaps/';
+// PDFJS.cMapUrl = '../../node_modules/embed-pdfjs-dist/cmaps/';
 // PDFJS.cMapPacked = true;
 
 var DEFAULT_URL = '../../web/compressed.tracemonkey-pldi-09.pdf';
@@ -37,20 +37,20 @@ var container = document.getElementById('pageContainer');
 
 // Loading document.
 PDFJS.getDocument(DEFAULT_URL).then(function (pdfDocument) {
-  // Document loaded, retrieving the page.
-  return pdfDocument.getPage(PAGE_TO_VIEW).then(function (pdfPage) {
-    // Creating the page view with default parameters.
-    var pdfPageView = new PDFJS.PDFPageView({
-      container: container,
-      id: PAGE_TO_VIEW,
-      scale: SCALE,
-      defaultViewport: pdfPage.getViewport(SCALE),
-      // We can enable text/annotations layers, if needed
-      textLayerFactory: new PDFJS.DefaultTextLayerFactory(),
-      annotationLayerFactory: new PDFJS.DefaultAnnotationLayerFactory()
-    });
-    // Associates the actual page with the view, and drawing it
-    pdfPageView.setPdfPage(pdfPage);
-    return pdfPageView.draw();
-  });
+	// Document loaded, retrieving the page.
+	return pdfDocument.getPage(PAGE_TO_VIEW).then(function (pdfPage) {
+		// Creating the page view with default parameters.
+		var pdfPageView = new PDFJS.PDFPageView({
+			container: container,
+			id: PAGE_TO_VIEW,
+			scale: SCALE,
+			defaultViewport: pdfPage.getViewport(SCALE),
+			// We can enable text/annotations layers, if needed
+			textLayerFactory: new PDFJS.DefaultTextLayerFactory(),
+			annotationLayerFactory: new PDFJS.DefaultAnnotationLayerFactory()
+		});
+		// Associates the actual page with the view, and drawing it
+		pdfPageView.setPdfPage(pdfPage);
+		return pdfPageView.draw();
+	});
 });

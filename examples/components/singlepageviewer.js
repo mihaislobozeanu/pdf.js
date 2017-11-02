@@ -16,17 +16,17 @@
 'use strict';
 
 if (!PDFJS.PDFSinglePageViewer || !PDFJS.getDocument) {
-  alert('Please build the pdfjs-dist library using\n' +
-        '  `gulp dist-install`');
+	alert('Please build the embed-pdfjs-dist library using\n' +
+		'  `gulp dist-install`');
 }
 
 // The workerSrc property shall be specified.
 //
-PDFJS.workerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.js';
+PDFJS.workerSrc = '../../node_modules/embed-pdfjs-dist/build/pdf.worker.js';
 
 // Some PDFs need external cmaps.
 //
-// PDFJS.cMapUrl = '../../node_modules/pdfjs-dist/cmaps/';
+// PDFJS.cMapUrl = '../../node_modules/embed-pdfjs-dist/cmaps/';
 // PDFJS.cMapPacked = true;
 
 var DEFAULT_URL = '../../web/compressed.tracemonkey-pldi-09.pdf';
@@ -38,31 +38,31 @@ var container = document.getElementById('viewerContainer');
 var pdfLinkService = new PDFJS.PDFLinkService();
 
 var pdfSinglePageViewer = new PDFJS.PDFSinglePageViewer({
-  container: container,
-  linkService: pdfLinkService,
+	container: container,
+	linkService: pdfLinkService,
 });
 pdfLinkService.setViewer(pdfSinglePageViewer);
 
 // (Optionally) enable find controller.
 var pdfFindController = new PDFJS.PDFFindController({
-  pdfViewer: pdfSinglePageViewer
+	pdfViewer: pdfSinglePageViewer
 });
 pdfSinglePageViewer.setFindController(pdfFindController);
 
 container.addEventListener('pagesinit', function () {
-  // We can use pdfSinglePageViewer now, e.g. let's change default scale.
-  pdfSinglePageViewer.currentScaleValue = 'page-width';
+	// We can use pdfSinglePageViewer now, e.g. let's change default scale.
+	pdfSinglePageViewer.currentScaleValue = 'page-width';
 
-  if (SEARCH_FOR) { // We can try search for things
-    pdfFindController.executeCommand('find', {query: SEARCH_FOR});
-  }
+	if (SEARCH_FOR) { // We can try search for things
+		pdfFindController.executeCommand('find', { query: SEARCH_FOR });
+	}
 });
 
 // Loading document.
 PDFJS.getDocument(DEFAULT_URL).then(function (pdfDocument) {
-  // Document loaded, specifying document for the viewer and
-  // the (optional) linkService.
-  pdfSinglePageViewer.setDocument(pdfDocument);
+	// Document loaded, specifying document for the viewer and
+	// the (optional) linkService.
+	pdfSinglePageViewer.setDocument(pdfDocument);
 
-  pdfLinkService.setDocument(pdfDocument, null);
+	pdfLinkService.setDocument(pdfDocument, null);
 });

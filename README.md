@@ -92,15 +92,8 @@ be loaded by `pdf.js`. The PDF.js files are large and should be minified for pro
 
 To use PDF.js in a web application you can choose to use a pre-built version of the library
 or to build it from source. We supply pre-built versions for usage with NPM and Bower under
-the `pdfjs-dist` name. For more information and examples please refer to the
+the `embed-pdfjs-dist` name. For more information and examples please refer to the
 [wiki page](https://github.com/mozilla/pdf.js/wiki/Setup-pdf.js-in-a-website) on this subject.
-
-## Including via a CDN
-
-PDF.js is hosted on several free CDNs:
- - https://www.jsdelivr.com/package/npm/pdfjs-dist
- - https://cdnjs.com/libraries/pdf.js
- - https://unpkg.com/pdfjs-dist/
 
 ## Learning
 
@@ -112,7 +105,7 @@ The repository contains a hello world example that you can run locally:
 
 + [examples/helloworld/](https://github.com/mozilla/pdf.js/blob/master/examples/helloworld/)
 
-More examples can be found in the examples folder. Some of them are using the pdfjs-dist package, which can be built and installed in this repo directory via `gulp dist-install` command.
+More examples can be found in the examples folder. Some of them are using the embed-pdfjs-dist package, which can be built and installed in this repo directory via `gulp dist-install` command.
 
 For an introduction to the PDF.js code, check out the presentation by our
 contributor Julian Viereck:
